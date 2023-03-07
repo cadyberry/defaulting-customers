@@ -1,5 +1,5 @@
 # defaulting-customers
-This project uses a data set of  175,425 records to predict defaulting customers. Two classification and regression tree (CART) models were created and used to classify default status using four explanatory variables: interest rate, loan amount, installment, and term. 
+This project uses a data set of  175,425 records to predict defaulting customers. Two classification and regression tree (CART) models were created and used to classify default status using four explanatory variables: interest rate, loan amount, installment, and term. One CART model does not account for misclassification costs (Naive model) and the other CART model (3.3x) does account for data-driven misclassification costs. 
 
  Baseline models were constructed. Accuracy, error rate, sensitivity specificity, Fβ scores and model costs were calculated for each model. Notable conclusions from analysis are as follows:
 
