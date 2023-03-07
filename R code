@@ -7,8 +7,7 @@
 #•	Installment represents how much the customer pays back every month.
 #•	Int_rate represents the interest rate under which the loan was taken.
 
-# Interest_amt is not a predictor.
-# Term is categorical
+
 
 library(psych)
 library(caret)
@@ -42,6 +41,7 @@ summary(ltest$Default)
 
 
 # summary statistics 
+
 # use mean loan and mean interest amount for cost matrix
 # loan amt calculated as:
 # interest_amt=(installment×term)-loan_amnt.
@@ -61,6 +61,7 @@ summary(ltrain$term)
 # Variable: Interest Amount
 ltrain$interest_amt <- ((ltrain$installment *ltrain$term) - ltrain$loan_amnt)
 ltest$interest_amt <- ((ltest$installment *ltest$term) - ltest$loan_amnt)
+# *Interest_amt is not a predictor*
 
 summary(ltrain$interest_amt)
 # 4391.66
