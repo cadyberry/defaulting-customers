@@ -10,7 +10,7 @@ This project uses a data set of  175,425 records to predict defaulting customers
 
 •	The 3.3x CART mode produced the greatest revenue at $455.11 per customer and a total revenue of $63,341,910.
 
-•	Decision Tree rules indicate:
+•	Decision Tree rules:
 
         o	If interest rate is less than 11.75%, then an applicant is classified as non-default, with 37% support, and 64% confidence.
 
