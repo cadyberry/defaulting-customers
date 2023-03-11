@@ -1,12 +1,4 @@
-# Bank Loan Data
-
-# Target variable: Default
-# All four of the predictors are continuous.
-#•	Loan_amnt represents how much money the customer received as a loan.
-#•	Term represents how long, in months, the payback period was.
-#•	Installment represents how much the customer pays back every month.
-#•	Int_rate represents the interest rate under which the loan was taken.
-
+# Import test and training sets
 
 
 library(psych)
@@ -14,20 +6,19 @@ library(caret)
 library(ggplot2)
 Set.seed(123) 
 
-
+# Target variable: Default
+# All four predictors are continuous.
 
 # 1 = positive = default, no loan given, no action taken
 # 0 = negative = no default, loan is given, action taken
 
 # Step 1. Data Prep
-# Test and Train sets are uploaded
 
-# set Default as categorical
+# Set Default as categorical
 ltest$Default<-as.factor(ltest$Default)
 ltrain$Default<-as.factor(ltrain$Default)
- 
-# partition data set, train & test
-# validate partition
+
+# EDA
 
 # Variable: Default
 summary(ltrain$Default)
@@ -40,13 +31,13 @@ summary(ltest$Default)
     #65086  22719 
 
 
-# summary statistics 
+# Summary statistics 
 
 # use mean loan and mean interest amount for cost matrix
 # loan amt calculated as:
 # interest_amt=(installment×term)-loan_amnt.
 
-# Explanatory Variables
+# Explanatory variables
 summary(ltrain$int_rate)
 # mean = 13.46
 summary(ltrain$loan_amnt)
@@ -79,24 +70,22 @@ summary(ltrain$interest_amt)
   #CostTP = $ 0
 
 
-# Step 2 
-# Establish Baseline Model Performance
+# Step 2: Establish Baseline Model Performance
 
 # All positive model: 
-# all defaulting, no loans given
-# TN=0	FP = 65,086
-# FN=0 	TP = 22,719
+# All defaulting customers, no loans given
+# TN  = 0	FP = 65,086
+# FN  = 0	TP = 22,719
 
 # METRICS
-# accuracy = tn + tp / gt = 22719 / 87805 =  0.2587438
-# error = 1-accuracy
-# sensitivity = true pos/ total actually pos = 22719/ (22719) =  1
-# specificity = true neg/ total actually neg = 0 
+# Accuracy = tn + tp / gt = 22719 / 87805 =  0.2587438
+# Error rate = 1-accuracy
+# Sensitivity = true pos/ total actually pos = 22719/ (22719) =  1
+# Specificity = true neg/ total actually neg = 0 
+# Precision = true pos / total predicted pos = 22719/ 87805 = 0.2587438
+# Recall = sensitivity
 
-# precision = true pos / total predicted pos = 22719/ 87805 = 0.2587438
-# recall = sensitivity
-
-#Fbeta scores
+# Fbeta scores
 #F1
 # 1 + 1^2 * (0.2587438 * 1) / ((1^2 *0.2587438 ) + 1) =  0.2211838
 # 2 * 0.2211838
@@ -110,60 +99,53 @@ summary(ltrain$interest_amt)
 # (1 + 0.5^2) *  0.2187258
 # f0.5 =1.25* = 0.2734073
 
-# need scoring matrix to determine total model cost
-#scoring matrix:
+# Scoring matrix to determine total model cost:
+# calculated using interest amount 
 #CostTN = $ -4,392
 #CostFP  = $ 0
 #CostFN = $ 14,514
 #CostTP = $ 0
 
-
-# total model cost = 
-#(0 * -4392 ) + (65086*0) + (0*14514) + (22719*0) = 0
-# calculate cost per customer
-# = 0
+# Total model cost = (0 * -4392 ) + (65086*0) + (0*14514) + (22719*0) = 0
+# calculate cost per customer = 0
 
 
-# All Negative model
-# no defaults, all loans given
+# All negative model
+# No defaults, all loans given
 # TN = 65,086	FP = 0
 # FN= 22,719 	TP = 0
 
-# METRICS
-# accuracy = tn + tp / gt  = 65086/87805
-# error = opposite accuracy
-# sensitivity = true pos/ total actually pos = 0 
-# specificity = true neg/ total actually neg = 1
 
-# precision = true pos / total predicted pos = 0 
-# recall = sensitivity = 0 
+              ## Metrics ##
+# Accuracy = tn + tp / gt  = 65086/87805
+# Error rate = opposite accuracy
+# Sensitivity = true pos/ total actually pos = 0 
+# Specificity = true neg/ total actually neg = 1
+# Precision = true pos / total predicted pos = 0 
+# Recall = sensitivity = 0 
 
-# Model cost
-# #scoring matrix:
+Scoring matrix:
 #CostTN = $ -4,392
 #CostFP  = $ 0
 #CostFN = $ 14,514
 #CostTP = $ 0
 
-# total model cost = 
-#(65086 * -4392 ) + (0*0) + (22719*14514) + (0*0) = 43,885,854
+# total model cost = (65086 * -4392 ) + (0*0) + (22719*14514) + (0*0) = 43,885,854
+# Cost per customer = 43885854/87805 = 499.8104
 
-# calculate cost per customer
-# 43885854/87805 = 499.8104
 
-# step 3: PCA/clustering
-# N/A
 
-# step 4. 
-# Use training set to develop CART model 
-# standardize data sets so larger variables don't overpower the others
-# using pre process command
+# Model Building
 
-# set term as factor
+# Set term as categorical: 36 months/ 64 months
 ltest$term<-as.factor(ltest$term)
 ltrain$term<-as.factor(ltrain$term)
 
-# standardize train data set
+# Use training set to develop CART model 
+# Standardize data sets so larger variables don't overpower the others
+# preprocess from caret
+
+# Standardize train data set
 preprocess.train.z <- preProcess(ltrain[1:5], method=c("center", "scale") )
 preprocess.train.z
 
@@ -171,7 +153,7 @@ ltrain.z <-
   predict(preprocess.train.z, ltrain[1:5] )
 View(ltrain.z)
 
-# standardize test data set
+# Standardize test data set
 preprocess.test.z <- preProcess(ltest[1:5], method=c("center", "scale") )
 preprocess.test.z
 
@@ -179,18 +161,11 @@ ltest.z <-
   predict(preprocess.test.z, ltest[1:5] )
 View(ltest.z)
 
-# Descriptive Statistics
+# Descriptive stats
 describe(ltest.z)
 describe(ltrain.z)
 
-
-# save data sets
-write.csv(ltrain.z, "ltrain_z")
-write.csv(ltest.z, "ltest_z")
-
-
-# Model Building 
-
+###################
 # Naive  CART model
 # CART 10 fold cross validation 
 set.seed(107)
@@ -198,34 +173,29 @@ TC <- trainControl(
   method = "CV",
   number = 10)
 
-
 fita<- train(Default ~ ., 
                     data = ltrain.z,
                     method = "rpart",
                     trControl = TC)
-# step 5. 
-# check for overfitting by analyzing metrics on folds
+
+# Check for overfitting by analyzing metrics on folds
 fita$resample
 
 
-# Step 6. Apply model to the standardized test data set.
+# Apply model to the standardized test data set
 naive_model <- predict(fita, ltest.z)
 
 
-# Get a contingency table of predictions vs actual Default values from test set.
+# Contingency table of predictions vs actual default values
 table(ltest.z$Default, naive_model)
 #     0     1
 #0 62579  2507
 #1 20050  2669
 
-
-# Naive Model METRICS
+                   ### Metrics ###
 # accuracy = tn + tp / gt = 62579+2669 / 87805 =  0.7431012
 # sensitivity = true pos/ total actually pos = 2669/ (2669+20050) =  0.1174
-      # not good at finding positives... need higher sensitivity
-# specificity = true neg/ total actually neg = 62579/ (2507+62579) = 0.9614817
-          # really good at finding true negatives
-
+# specificity = true neg/ total actually neg = 62579/ (2507+62579) = 0.9614817 # performs much better with identifying true negatives
 # precision = true pos / total predicted pos = 2669 / (2507 +2669) = 0.5156491
 # recall = sensitivity
 
@@ -247,33 +217,32 @@ table(ltest.z$Default, naive_model)
 # f0.5 =1.25* = 0.1569886
 
 
-# calculating model cost
-#TN= -4392
+# Model cost
+#TN= -4392 # from scoring matrix 
 #FN = 14514
 
-# COST: ((62579*-4392) + (20050*14514)) 
-#/ 87805=  184.0297
+# Model Cost: ((62579*-4392) + (20050*14514))/ 87805=  184.0297
 
 
-# return to step 4 for building another model
-# 3.3x CART model 
+###################
+# 3.3x CART model #
+
 # resampling as a surrogate for misclassification costs
-
-# Re-sample records
-# Step 1 Identify the rare record indices with positive responses/ action taken / non default.
+# 1 Re-sample records
+# Get rare record indices with positive responses
 rare.record.indices <- 
   which(ltrain.z$Default == 1)
 
-# Step 2 Resample the rare record indices.
+# 2  Resample rare record indices
 rare.indices.resampled <- 
   sample(x = rare.record.indices, 
          size = 51559, replace = TRUE)
 
-# Step 3 Extract the resampled records.
+# 3 Extract the resampled records
 rare.records.resampled <- 
   ltrain.z[rare.indices.resampled,]
 
-# Step 4  Merge extracted records with the original data set. 
+#  4 Merge extracted records with train set
 set.seed(107)
 ltrain.3.3x <- 
   rbind(ltrain.z, rare.records.resampled)
@@ -281,7 +250,7 @@ ltrain.3.3x <-
 # table 
 table(ltrain.3.3x$Default)
   #0     1 
-  #65203 73976 
+  #65203 73976 # resampling successful 
 
 # 3.3x CART
 set.seed(107)
@@ -292,15 +261,15 @@ fitb <- train(Default ~ .,
                     trControl = TC)
 
 
-# Step 5 Check for overfitting.
+# Check for overfitting
 fitb$resample
 
 
-# Step 6 Apply model to the test data set.
+# Apply model to the test set
 resampled_model <- predict(fitb, ltest.z)
 
 
-# contingency table of predict vs actual Default values from test set.
+# contingency table of predict vs actual Default values
 table(ltest.z$Default, resampled_model)
 #          Predicted
 #           0     1
@@ -308,14 +277,15 @@ table(ltest.z$Default, resampled_model)
 #       1  6050 16669
 # reduces losses
 
-
+# variable: default
 summary(ltrain.3.3x$Default)
 # total negative 65203 
 # total positive in resampled = 73976 
 # total in resampled =   139179
 
 
-# METRICS
+
+                   ### METRICS ###
 # accuracy = tn + tp / gt = (16650+34478) / 139179 =  0.3673543
 # sensitivity = true pos/ total actually pos = 16669/(30657+16669) =   0.3522165
 # specificity = true neg/ total actually neg = 34429/ (34429+30657) = 0.5297299
@@ -342,26 +312,22 @@ summary(ltrain.3.3x$Default)
 # 1.25*0.1255909 = 0.299322
 
 
-#calculating model cost
-#TN= -4392
+#model cost
+#TN= -4392 #scoring matrix
 #FN = 14514
 
-# COST: ((34429*-4392) + (6050*14514)) / 139179= -455.5462
+# COST: ((34429*-4392) + (6050*14514)) / 87805= -722.08
 
-# final model decision tree.
+# 3.3x Decision tree
+
 library(rattle)
 fancyRpartPlot(fitb$finalModel)
 
-
-##########################
-
-# Decision Trees
-# un-standardization
-
+# un-standardization of vars for decision rule interpretation 
 # y = Z-score * sd + mean
 
 # int rate 
-(-0.33 * 5.16) +  13.46 = 11.7572
+(-0.33 * 5.16) + 13.46 = 11.7572
 (0.15 * 5.16) +  13.46 = 14.234
 (0.71 * 5.16) +  13.46 = 17.1236
 
